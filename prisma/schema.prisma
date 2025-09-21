@@ -1,0 +1,33 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Family {
+  id     String @id @default(cuid())
+  name   String
+  users  User[]
+  tasks  Task[]
+}
+
+model User {
+  id       String  @id @default(cuid()) // We will link this to Supabase Auth ID
+  email    String  @unique
+  familyId String?
+  family   Family? @relation(fields: [familyId], references: [id])
+}
+
+model Task {
+  id        String   @id @default(cuid())
+  title     String
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now())
+  familyId  String
+  family    Family   @relation(fields: [familyId], references: [id])
+}
